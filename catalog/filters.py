@@ -6,6 +6,6 @@ class EmployeeFilter(django_filters.FilterSet):
     class Meta:
         model = Employee
         fields = {
-            'Departament': ['exact'],
+            'departament': ['exact'],
             'start_date': ['exact'],
         }
