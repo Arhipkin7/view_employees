@@ -36,7 +36,7 @@ class Employee(models.Model):
     departament = models.ForeignKey(Department, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f'{self.last_name} {self.first_name} {self.second_name} {self.start_date} {self.role}'
+        return f'{self.last_name} {self.first_name} {self.second_name}. {self.start_date}. {self.role}'
 
     class Meta:
         ordering = ["last_name"]
