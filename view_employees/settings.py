@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'catalog.apps.CatalogConfig',
     'phonenumber_field',
     'django_filters',
+    'django_extensions',
 ]
 
 MIDDLEWARE = [
