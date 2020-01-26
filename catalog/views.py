@@ -1,5 +1,7 @@
 import numpy as np
 
+from itertools import groupby
+
 from django.views.generic import ListView, DetailView
 from django.shortcuts import get_object_or_404
 from django_filters.views import FilterView
@@ -7,30 +9,8 @@ from django.db.models.functions import Upper, Substr
 
 from .models import Employee
 from .filters import EmployeeFilter
-from django.db.models.query import QuerySet
-from collections import Counter
 
 NUMBER_OF_GROUP = 7
-
-
-# def letters(self):
-#     letters = list([f['fl'] for f in Employee.objects.annotate(fl=Upper(Substr('last_name', 1, 1))).values('fl')])
-#     k, m = divmod(len(letters), NUMBER_OF_GROUP)
-#     letgroups = tuple((letters[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in range(NUMBER_OF_GROUP)))
-#     str_for_links = {id: val[0] + '-' + val[-1] for id, val in enumerate(letgroups) if val}
-#
-#     print(letters)
-#     letters_new = set(letters)
-#     print(letters_new)
-#     print(k)
-#     print(m)
-#     print(letgroups)
-#     print(str_for_links)
-#     return {
-#         'letgroups': letgroups,
-#         'letters': letters,
-#         'str_for_links': str_for_links
-#     }
 
 
 class EmployeesView(FilterView):
@@ -63,30 +43,29 @@ class EmployeesAlphabetView(ListView):
 
     @staticmethod
     def get_letter():
-        letters = list(
-            [f['let'] for f in Employee.objects.annotate(let=Upper(Substr('last_name', 1, 1))).values('let')])
-        k, m = divmod(len(letters), NUMBER_OF_GROUP)
-        get_groups = tuple((letters[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in np.arange(NUMBER_OF_GROUP)))
-        str_for_links = {id: val[0] + '-' + val[-1] for id, val in enumerate(get_groups) if val}
+        all_letters = list(
+            [upper_latter['letter'] for upper_latter in
+             Employee.objects.annotate(letter=Upper(Substr('last_name', 1, 1))).values('letter')])
+        unique_letters = [el for el, _ in groupby(all_letters)]
+        number_of_letters = len(unique_letters) // NUMBER_OF_GROUP
+        balance = len(unique_letters) % NUMBER_OF_GROUP
+        get_groups = tuple(
+            (unique_letters[i * number_of_letters + min(i, balance):(i + 1) * number_of_letters + min(i + 1, balance)]
+             for i in np.arange(NUMBER_OF_GROUP)))
+        letters_in_group = {id_group: letter[0] + '-' + letter[-1] for id_group, letter in enumerate(get_groups) if
+                            letter}
 
-        return {
-            'get_groups': get_groups,
-            'letters': letters,
-            'str_for_links': str_for_links,
-        }
+        return {'get_groups': get_groups, 'letters_in_group': letters_in_group}
 
     def get_queryset(self):
-        letgroups = self.get_letter()
         try:
-            # get_letters = self.request.GET['letters']
-            return Employee.objects.annotate(let=Upper(Substr('last_name', 1, 1))).filter(
-                let__in=letgroups['get_groups'][int(self.request.GET['letters'])])
+            return Employee.objects.annotate(letter=Upper(Substr('last_name', 1, 1))).filter(
+                letter__in=self.get_letter()['get_groups'][int(self.request.GET['group'])])
         except KeyError:
-            return Employee.objects.annotate(let=Upper(Substr('last_name', 1, 1))).filter(
-                let__in=letgroups['get_groups'][0])
+            return Employee.objects.annotate(letter=Upper(Substr('last_name', 1, 1))).filter(
+                letter__in=self.get_letter()['get_groups'][0])
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super(EmployeesAlphabetView, self).get_context_data(**kwargs)
-        letgroups = self.get_letter()
-        context['str_for_links'] = letgroups['str_for_links']
+        context['letters_in_group'] = self.get_letter()['letters_in_group']
         return context

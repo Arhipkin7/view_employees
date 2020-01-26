@@ -1,3 +1,5 @@
+import numpy as np
+
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 from enum import Enum

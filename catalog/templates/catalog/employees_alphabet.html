@@ -8,13 +8,13 @@
 <div class="container">
     <h1>Alphabet List</h1>
     <div>
-        {% for link, str in str_for_links.items %}
-            <a href="{% url 'alphabetical-list'%}?letters={{link}}">{{str}}</a>
+        {% for id_group, letters in letters_in_group.items %}
+        <a href="{% url 'alphabetical-list'%}?group={{id_group}}">{{letters}}</a>
         {% endfor %}
     </div>
     <div>
         {% for employee in employees%}
-            <p><a href="{% url 'employee-detail' employee.pk %}">{{employee}}</a></p>
+        <p><a href="{% url 'employee-detail' employee.pk %}">{{employee}}</a></p>
         {% endfor %}
     </div>
 </div>
