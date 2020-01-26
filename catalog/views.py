@@ -21,7 +21,7 @@ class EmployeesView(FilterView):
 
     def get_filterset(self, filterset_class):
         r = self.request.GET
-        if bool(r) and 'page' not in r:
+        if r:
             self.request.session['filter'] = r
         else:
             r = self.request.session.get('filter', self.request.GET)
