@@ -1,11 +1,13 @@
 import numpy as np
 
 from itertools import groupby
+from typing import Dict
 
 from django.views.generic import ListView, DetailView
 from django.shortcuts import get_object_or_404
-from django_filters.views import FilterView
 from django.db.models.functions import Upper, Substr
+from django_filters.views import FilterView
+from django_filters.views import FilterMixinRenames
 
 from .models import Employee
 from .filters import EmployeeFilter
@@ -19,7 +21,7 @@ class EmployeesView(FilterView):
     context_object_name = 'employees'
     paginate_by = 10
 
-    def get_filterset(self, filterset_class):
+    def get_filterset(self, filterset_class) -> FilterMixinRenames:
         r = self.request.GET
         if r:
             self.request.session['filter'] = r
@@ -42,7 +44,7 @@ class EmployeesAlphabetView(ListView):
     context_object_name = 'employees'
 
     @staticmethod
-    def get_letter():
+    def get_letter() -> Dict:
         all_letters = list(
             [upper_latter['letter'] for upper_latter in
              Employee.objects.annotate(letter=Upper(Substr('last_name', 1, 1))).values('letter')])
