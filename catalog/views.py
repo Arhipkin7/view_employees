@@ -1,5 +1,3 @@
-import numpy as np
-
 from itertools import groupby
 from typing import Dict
 
