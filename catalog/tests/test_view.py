@@ -5,6 +5,9 @@ from django.urls import reverse
 
 from ..models import Department, Employee
 
+STATUS_CODE_OK = 200
+STATUS_CODE_NOT_FOUND = 404
+
 
 class EmployeeDetailModelTests(TestCase):
     def setUp(self) -> None:
@@ -25,17 +28,17 @@ class EmployeeDetailModelTests(TestCase):
 
     def test_view_url_employees(self) -> None:
         resp = self.client.get(f'/employee/{self.employee.id}/')
-        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.status_code, STATUS_CODE_OK)
 
     def test_view_url_employee_detail(self) -> None:
         resp = self.client.get(reverse('employee-detail', args=[str(self.employee.id)]))
-        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.status_code, STATUS_CODE_OK)
 
     def test_view_use_correct_template(self) -> None:
         resp = self.client.get(reverse('employee-detail', args=[str(self.employee.id)]))
-        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.status_code, STATUS_CODE_OK)
         self.assertTemplateUsed(resp, 'catalog/employee_detail.html')
 
     def test_view_if_id_is_out_of_range(self) -> None:
         resp = self.client.get(f'/employees/{self.employee.id + 7}/')
-        self.assertEqual(resp.status_code, 404)
+        self.assertEqual(resp.status_code, STATUS_CODE_NOT_FOUND)
