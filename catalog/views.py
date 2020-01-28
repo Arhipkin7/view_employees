@@ -1,6 +1,5 @@
 import numpy as np
 
-from itertools import groupby
 from typing import Dict
 
 from django.views.generic import ListView, DetailView
@@ -49,10 +48,11 @@ class EmployeesAlphabetView(ListView):
             [upper_latter['letter'] for upper_latter in
              Employee.objects.annotate(letter=Upper(Substr('last_name', 1, 1))).values('letter')])
 
-        get_groups = [all_letters[i * len(all_letters) // NUMBER_OF_GROUP: (i + 1) * len(all_letters) // NUMBER_OF_GROUP]
-                   for i in range(NUMBER_OF_GROUP)]
+        get_groups = [
+            all_letters[i * len(all_letters) // NUMBER_OF_GROUP: (i + 1) * len(all_letters) // NUMBER_OF_GROUP]
+            for i in np.arange(NUMBER_OF_GROUP)]
 
-        for i in range(len(get_groups) - 1):
+        for i in np.arange(len(get_groups) - 1):
             try:
                 last_latter_1 = get_groups[i][-1]
                 first_latter_2 = get_groups[i + 1][0]
