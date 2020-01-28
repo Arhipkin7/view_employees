@@ -5,7 +5,7 @@ import csv
 from ..models import Employee, Department
 
 FILE_NAME = 'data.csv'
-SIZE_OF_EMPLOYEES = 31
+SIZE_OF_EMPLOYEES = 151
 SIZE_OF_DEPARTAMENT = 3
 
 fix = pd.read_csv(f'catalog/scripts/{FILE_NAME}', quoting=csv.QUOTE_NONE, quotechar=" ", sep=',', encoding='utf8')

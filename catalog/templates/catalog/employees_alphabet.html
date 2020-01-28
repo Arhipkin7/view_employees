@@ -8,9 +8,11 @@
 <div class="container">
     <h1>Alphabet List</h1>
     <div>
+        <div>
         {% for id_group, letters in letters_in_group.items %}
-        <a href="{% url 'alphabetical-list'%}?group={{id_group}}">{{letters}}</a>
+            <a href="{% url 'alphabetical-list'%}?group={{id_group}}">{{letters}}</a>
         {% endfor %}
+    </div>
     </div>
     <div>
         {% for employee in employees%}
