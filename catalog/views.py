@@ -48,12 +48,27 @@ class EmployeesAlphabetView(ListView):
         all_letters = list(
             [upper_latter['letter'] for upper_latter in
              Employee.objects.annotate(letter=Upper(Substr('last_name', 1, 1))).values('letter')])
-        unique_letters = [el for el, _ in groupby(all_letters)]
-        number_of_letters = len(unique_letters) // NUMBER_OF_GROUP
-        balance = len(unique_letters) % NUMBER_OF_GROUP
-        get_groups = tuple(
-            (unique_letters[i * number_of_letters + min(i, balance):(i + 1) * number_of_letters + min(i + 1, balance)]
-             for i in np.arange(NUMBER_OF_GROUP)))
+
+        get_groups = [all_letters[i * len(all_letters) // NUMBER_OF_GROUP: (i + 1) * len(all_letters) // NUMBER_OF_GROUP]
+                   for i in range(NUMBER_OF_GROUP)]
+
+        for i in range(len(get_groups) - 1):
+            try:
+                last_latter_1 = get_groups[i][-1]
+                first_latter_2 = get_groups[i + 1][0]
+                if last_latter_1 == first_latter_2:
+                    latter = last_latter_1
+                    count_1 = [w for w in get_groups[i] if w == latter]
+                    count_2 = [w for w in get_groups[i + 1] if w == latter]
+                    if len(count_1) >= len(count_2):
+                        get_groups[i] = get_groups[i] + count_2
+                        get_groups[i + 1] = [w for w in get_groups[i + 1] if w != latter]
+                    elif len(count_1) < len(count_2):
+                        get_groups[i + 1] = count_1 + get_groups[i + 1]
+                        get_groups[i] = [w for w in get_groups[i] if w != latter]
+            except:
+                pass
+
         letters_in_group = {id_group: letter[0] + '-' + letter[-1] for id_group, letter in enumerate(get_groups) if
                             letter}
 
